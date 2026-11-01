@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VahanaShare | Premium Rentals</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090d18;color:#f5f5f5;font-family:Arial,sans-serif}
+header{background:#111827;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.logo{font-size:24px;font-weight:bold;color:#e8bd68}
+nav{display:flex;gap:10px;flex-wrap:wrap}
+button{background:#e8bd68;color:#111;border:0;padding:11px 16px;border-radius:7px;font-weight:bold;cursor:pointer}
+button:hover{opacity:.85}
+.secondary{background:#263247;color:white}
+.danger{background:#963e4b;color:white}
+.success{background:#207454;color:white}
+main{max-width:1150px;margin:auto;padding:25px 18px}
+.hero{padding:65px 35px;border-radius:15px;background:linear-gradient(90deg,#080d18 15%,#080d1888),url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1400') center/cover}
+.hero h1{font-size:clamp(35px,6vw,60px);margin:10px 0;color:white}
+.gold{color:#e8bd68}
+.section{margin-top:40px;scroll-margin-top:85px}
+h2{font-size:28px}
+.muted{color:#aab4c5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card,.panel{background:#121a2a;border:1px solid #2a3850;border-radius:12px;overflow:hidden}
+.card img{width:100%;height:170px;object-fit:cover}
+.card-body{padding:16px}
+.card h3{margin:5px 0}
+.price{color:#e8bd68;font-size:20px;font-weight:bold;margin:12px 0}
+.card button{width:100%}
+.panel{padding:20px}
+input,select,textarea{width:100%;padding:12px;background:#0d1524;color:white;border:1px solid #34425a;border-radius:7px;margin:5px 0 13px;font:inherit}
+label{font-size:13px;color:#b8c1d0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hidden{display:none!important}
+.notice{padding:12px;background:#1c3047;border-radius:7px;margin:12px 0}
+.error{background:#572c36}.good{background:#174b3c}
+.booking{background:#0d1524;border:1px solid #34425a;border-radius:9px;padding:15px;margin:12px 0}
+.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.status{font-size:12px;padding:5px 10px;border-radius:20px;background:#59482c}
+.Accepted{background:#176047}.Rejected{background:#71333d}
+.ticket{background:white;color:#172033;padding:25px;border-radius:10px;max-width:720px;margin:15px auto}
+.ticket h2{color:#172033}
+.ticket table{width:100%;border-collapse:collapse;margin-top:15px}
+.ticket td{padding:10px 5px;border-bottom:1px solid #ddd}
+.ticket td:first-child{font-weight:bold;width:38%}
+.terms{background:#f0f2f5;padding:14px;border-radius:8px;color:#394456;font-size:13px;margin-top:15px}
+footer{text-align:center;padding:30px;color:#9ba5b7}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.hero{padding:35px 20px}header{align-items:flex-start;gap:12px;flex-direction:column}}
+@media print{body *{visibility:hidden!important}#ticketArea,#ticketArea *{visibility:visible!important}#ticketArea{position:absolute;top:0;left:0;width:100%}.ticket{max-width:none}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">VAHANA<span style="color:white">SHARE</span></div>
+ <nav>
+  <button class="secondary" onclick="go('vehicles')">Vehicles</button>
+  <button class="secondary" onclick="go('myBookings')">My Bookings</button>
+  <button class="secondary" onclick="go('admin')">Admin</button>
+ </nav>
+</header>
+
+<main>
+<section class="hero">
+ <p class="gold">PREMIUM VEHICLE RENTALS</p>
+ <h1>Your Journey.<br>Your Vehicle.</h1>
+ <p>Discover premium cars and bikes for your next journey.</p>
+ <button onclick="go('vehicles')">Explore Vehicles</button>
+</section>
+
+<section class="section" id="vehicles">
+ <div class="row">
+  <div><p class="gold">OUR COLLECTION</p><h2>Available Vehicles</h2></div>
+  <div>
+   <input id="search" placeholder="Search vehicles..." oninput="renderVehicles()">
+   <select id="filter" onchange="renderVehicles()">
+    <option value="All">All vehicles</option>
+    <option value="Car">Cars</option>
+    <option value="Bike">Bikes</option>
+   </select>
+  </div>
+ </div>
+ <div class="grid" id="vehicleGrid"></div>
+</section>
+
+<section class="section hidden" id="bookingSection">
+ <h2 id="bookingHeading">Book Vehicle</h2>
+ <div class="panel">
+  <div id="bookingMessage"></div>
+  <form id="bookingForm">
+   <input type="hidden" id="vehicleId">
+   <div class="form-grid">
+    <div><label>Full Name</label><input id="customerName" required></div>
+    <div><label>Phone Number</label><input id="phone" required pattern="[0-9+ -]{8,16}"></div>
+    <div><label>Pickup Date</label><input type="date" id="startDate" required></div>
+    <div><label>Return Date</label><input type="date" id="endDate" required></div>
+   </div>
+   <label>Additional Note</label>
+   <textarea id="note" rows="2"></textarea>
+   <p id="estimate" class="gold"></p>
+   <div class="notice">Your booking request will be sent to the administrator for approval.</div>
+   <button type="submit">Submit Booking Request</button>
+  </form>
+ </div>
+</section>
+
+<section class="section" id="myBookings">
+ <h2>My Bookings</h2>
+ <div id="myBookingList"></div>
+</section>
+
+<section class="section" id="admin">
+ <h2>Admin Dashboard</h2>
+ <div class="panel" id="adminLogin">
+  <p class="muted">Administrator Login</p>
+  <form id="adminForm">
+   <label>Email</label>
+   <input type="email" id="adminEmail" required>
+   <label>Password</label>
+   <input type="password" id="adminPassword" required>
+   <div id="adminMessage"></div>
+   <button type="submit">Login</button>
+  </form>
+  <p class="muted">Demo email: admin@vahanashare.com</p>
+  <p class="muted">Demo password: Admin@123</p>
+ </div>
+ <div id="adminDashboard" class="hidden">
+  <div class="row">
+   <h3>Booking Requests</h3>
+   <button class="secondary" onclick="logout()">Logout</button>
+  </div>
+  <div id="adminBookingList"></div>
+ </div>
+</section>
+
+<section class="section hidden" id="ticketSection">
+ <h2>Booking Confirmation</h2>
+ <div id="ticketArea"></div>
+ <div style="text-align:center">
+  <button onclick="window.print()">Print / Save as PDF</button>
+  <button class="secondary" onclick="closeTicket()">Close</button>
+ </div>
+</section>
+</main>
+
+<footer>VahanaShare | Academic Project Demonstration</footer>
+
+<script>
+"use strict";
+
+const vehicles=[
+{id:"c1",name:"Mercedes-Benz S-Class",type:"Car",seats:5,price:6500,img:"https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800"},
+{id:"c2",name:"BMW 5 Series",type:"Car",seats:5,price:4800,img:"https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800"},
+{id:"c3",name:"Porsche 911",type:"Car",seats:2,price:9500,img:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"},
+{id:"c4",name:"Range Rover Sport",type:"Car",seats:5,price:7200,img:"https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800"},
+{id:"b1",name:"BMW Motorrad",type:"Bike",seats:2,price:2200,img:"https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800"},
+{id:"b2",name:"Kawasaki Ninja",type:"Bike",seats:2,price:1800,img:"https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800"},
+{id:"b3",name:"Royal Enfield Classic",type:"Bike",seats:2,price:1200,img:"https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800"}
+];
+
+const KEY="vahanShareBookings";
+let bookings=load();
+let adminLoggedIn=false;
+
+function load(){
+ try{return JSON.parse(localStorage.getItem(KEY)||"[]")}
+ catch(e){return []}
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(bookings));return true}
+ catch(e){alert("Browser storage is unavailable.");return false}
+}
+function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function go(id){document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+function today(){
+ const d=new Date();
+ d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+ return d.toISOString().slice(0,10);
+}
+function days(a,b){
+ return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000)+1;
+}
+function dateText(s){
+ return new Date(s+"T00:00:00").toLocaleDateString("en-IN");
+}
+function overlaps(a,b,c,d){return a<=d&&c<=b}
+
+function renderVehicles(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const type=document.getElementById("filter").value;
+ const list=vehicles.filter(v=>(type==="All"||v.type===type)&&v.name.toLowerCase().includes(q));
+ document.getElementById("vehicleGrid").innerHTML=list.map(v=>`
+ <article class="card">
+  <img src="${v.img}" alt="${safe(v.name)}" onerror="this.style.display='none'">
+  <div class="card-body">
+   <h3>${safe(v.name)}</h3>
+   <p class="muted">${v.type} · ${v.seats} seats</p>
+   <div class="price">${money(v.price)} / day</div>
+   <button onclick="openBooking('${v.id}')">Book Vehicle</button>
+  </div>
+ </article>`).join("")||"<p>No vehicles found.</p>";
+}
+
+function openBooking(id){
+ const v=vehicles.find(x=>x.id===id);
+ if(!v)return;
+ document.getElementById("bookingForm").reset();
+ document.getElementById("vehicleId").value=id;
+ document.getElementById("bookingHeading").textContent="Book "+v.name;
+ document.getElementById("bookingMessage").innerHTML="";
+ document.getElementById("startDate").min=today();
+ document.getElementById("endDate").min=today();
+ document.getElementById("estimate").textContent=money(v.price)+" per day";
+ document.getElementById("bookingSection").classList.remove("hidden");
+ go("bookingSection");
+}
+
+document.getElementById("startDate").addEventListener("change",estimate);
+document.getElementById("endDate").addEventListener("change",estimate);
+
+function estimate(){
+ const v=vehicles.find(x=>x.id===document.getElementById("vehicleId").value);
+ const a=document.getElementById("startDate").value;
+ const b=document.getElementById("endDate").value;
+ if(!v||!a||!b)return;
+ const n=days(a,b);
+ document.getElementById("estimate").textContent=n>0?n+" day(s) · Estimated total: "+money(n*v.price):"Invalid date range";
+ document.getElementById("endDate").min=a;
+}
+
+document.getElementById("bookingForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ const id=document.getElementById("vehicleId").value;
+ const v=vehicles.find(x=>x.id===id);
+ const name=document.getElementById("customerName").value.trim();
+ const phone=document.getElementById("phone").value.trim();
+ const start=document.getElementById("startDate").value;
+ const end=document.getElementById("endDate").value;
+
+ if(!v||!name||!phone||!start||!end)return;
+ if(start<today()||end<start){
+  document.getElementById("bookingMessage").innerHTML='<div class="notice error">Please choose valid dates.</div>';
+  return;
+ }
+
+ const clash=bookings.some(b=>b.vehicleId===id&&
+ (b.status==="Pending"||b.status==="Accepted")&&
+ overlaps(start,end,b.startDate,b.endDate));
+
+ if(clash){
+  document.getElementById("bookingMessage").innerHTML='<div class="notice error">This vehicle has another pending or accepted booking for those dates.</div>';
+  return;
+ }
+
+ const count=days(start,end);
+ const booking={
+  id:"VS"+Date.now(),
+  vehicleId:id,
+  vehicleName:v.name,
+  type:v.type,
+  price:v.price,
+  days:count,
+  total:count*v.price,
+  name:name,
+  phone:phone,
+  start:start,
+  end:end,
+  note:document.getElementById("note").value.trim(),
+  status:"Pending"
+ };
+
+ bookings.unshift(booking);
+ if(!save())return;
+ renderAll();
+ document.getElementById("bookingMessage").innerHTML='<div class="notice good">Booking request submitted successfully!</div>';
+ document.getElementById("bookingForm").reset();
+});
+
+function renderMyBookings(){
+ const el=document.getElementById("myBookingList");
+ el.innerHTML=bookings.length?bookings.map(b=>`
+ <div class="booking">
+  <div class="row">
+   <div><strong>${safe(b.vehicleName)}</strong>
+    <p class="muted">${safe(b.id)} · ${dateText(b.start)} – ${dateText(b.end)}</p>
+    <p>${safe(b.name)} · ${money(b.total)}</p>
+   </div>
+   <span class="status ${b.status}">${b.status}</span>
+  </div>
+  ${b.status==="Accepted"?`<button onclick="showTicket('${b.id}')">View Ticket</button>`:""}
+ </div>`).join(""):"<p class='muted'>No booking requests yet.</p>";
+}
+
+document.getElementById("adminForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ const email=document.getElementById("adminEmail").value.trim().toLowerCase();
+ const password=document.getElementById("adminPassword").value;
+ if(email==="admin@vahanashare.com"&&password==="Admin@123"){
+  adminLoggedIn=true;
+  document.getElementById("adminLogin").classList.add("hidden");
+  document.getElementById("adminDashboard").classList.remove("hidden");
+  document.getElementById("adminMessage").innerHTML="";
+  renderAdmin();
+ }else{
+  document.getElementById("adminMessage").innerHTML='<div class="notice error">Incorrect email or password.</div>';
+ }
+});
+
+function logout(){
+ adminLoggedIn=false;
+ document.getElementById("adminDashboard").classList.add("hidden");
+ document.getElementById("adminLogin").classList.remove("hidden");
+ document.getElementById("adminPassword").value="";
+}
+
+function renderAdmin(){
+ if(!adminLoggedIn)return;
+ const el=document.getElementById("adminBookingList");
+ el.innerHTML=bookings.length?bookings.map(b=>`
+ <div class="booking">
+  <div class="row">
+   <div>
+    <strong>${safe(b.vehicleName)}</strong>
+    <p class="muted">Booking ID: ${safe(b.id)}</p>
+    <p>${safe(b.name)} · ${safe(b.phone)}</p>
+    <p class="muted">${dateText(b.start)} to ${dateText(b.end)}</p>
+    <p>Total: ${money(b.total)}</p>
+   </div>
+   <span class="status ${b.status}">${b.status}</span>
+  </div>
+  ${b.note?`<p class="muted">Note: ${safe(b.note)}</p>`:""}
+  ${b.status==="Pending"?`
+   <button class="success" onclick="changeStatus('${b.id}','Accepted')">Accept</button>
+   <button class="danger" onclick="changeStatus('${b.id}','Rejected')">Reject</button>`:""}
+  ${b.status==="Accepted"?`<button onclick="showTicket('${b.id}')">Open Ticket</button>`:""}
+ </div>`).join(""):"<p>No booking requests received.</p>";
+}
+
+function changeStatus(id,status){
+ const b=bookings.find(x=>x.id===id);
+ if(!b)return;
+ if(status==="Accepted"){
+  const clash=bookings.some(o=>o.id!==id&&o.vehicleId===b.vehicleId&&o.status==="Accepted"&&overlaps(b.start,b.end,o.start,o.end));
+  if(clash){alert("Another accepted booking overlaps these dates.");return;}
+ }
+ b.status=status;
+ if(save())renderAll();
+}
+
+function showTicket(id){
+ const b=bookings.find(x=>x.id===id);
+ if(!b||b.status!=="Accepted"){
+  alert("Ticket is available after admin approval.");
+  return;
+ }
+ document.getElementById("ticketArea").innerHTML=`
+ <div class="ticket">
+  <div class="row">
+   <div><h2 class="gold">VAHANASHARE</h2><h2>Vehicle Booking Ticket</h2><p>Booking confirmation</p></div>
+   <div><strong>${safe(b.id)}</strong><p style="color:green">APPROVED</p></div>
+  </div>
+  <table>
+   <tr><td>Renter Name</td><td>${safe(b.name)}</td></tr>
+   <tr><td>Phone Number</td><td>${safe(b.phone)}</td></tr>
+   <tr><td>Vehicle</td><td>${safe(b.vehicleName)}</td></tr>
+   <tr><td>Vehicle Type</td><td>${safe(b.type)}</td></tr>
+   <tr><td>Pickup Date</td><td>${dateText(b.start)}</td></tr>
+   <tr><td>Return Date</td><td>${dateText(b.end)}</td></tr>
+   <tr><td>Duration</td><td>${b.days} day(s)</td></tr>
+   <tr><td>Rate per Day</td><td>${money(b.price)}</td></tr>
+   <tr><td>Estimated Total</td><td><strong>${money(b.total)}</strong></td></tr>
+   <tr><td>Status</td><td>Accepted</td></tr>
+  </table>
+  <div class="terms">
+   <strong>Vehicle Condition and Damage Responsibility</strong><br>
+   The renter must use the vehicle responsibly and return it in the condition recorded at handover, allowing for normal wear and tear. The renter may be responsible for reasonable repair costs for damage that occurs during the rental and is shown to have resulted from the renter's negligence or misuse. Pre-existing damage, normal wear and tear, and mechanical faults not caused by the renter should not be charged to the renter. Any proposed repair charge should be supported by a condition report and repair estimate or invoice. The renter should be allowed to review and dispute the claim. Final responsibility is subject to the signed rental agreement and applicable law.
+  </div>
+  <p style="font-size:12px;color:#667">This is an academic project demonstration ticket, not a legal contract or payment receipt.</p>
+ </div>`;
+ document.getElementById("ticketSection").classList.remove("hidden");
+ go("ticketSection");
+}
+
+function closeTicket(){
+ document.getElementById("ticketSection").classList.add("hidden");
+}
+function renderAll(){
+ renderVehicles();
+ renderMyBookings();
+ renderAdmin();
+}
+renderAll();
+</script>
+</body>
+</html>
